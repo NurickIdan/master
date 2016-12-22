@@ -13,16 +13,6 @@ class Coordinate:
     def __repr__(self):
         return self.__str__()
 
-def matrixFromFile(filename):
-    import numpy
-    data = file(filename,"rb").readlines()
-    result = numpy.zeros((len(data)-2,len(data)-2))
-    for i in range(2,len(data)):
-        vals = map(float,data[i].split()[1:])
-        for j in range(len(vals)):
-            result[i-2,j]=vals[j]
-    return result
-
 def matrix2contracted(matrix, badrows, badcols):
     ##This gets rid of rows and columns whose value is zero. But watch out, it doesn't copy the original matrix (for speed) but can muck it up as a result.
 
@@ -52,12 +42,12 @@ def matrix2expanded(matrix,badrows):
 ##This restores rows and columns removed by matrix2contracted into the eigenvector.
 
         from numpy import zeros
-        dim = len(vector)+len(badrows)
+        dim = len(matrix)+len(badrows)
         newmatrix=zeros((dim,dim), dtype=float)
-        goodrows=[i for i in range(len(vector)+len(badrows)) if i not in badrows]
+        goodrows=[i for i in range(len(matrix)+len(badrows)) if i not in badrows]
         for i in range(len(goodrows)):
             for j in range(len(goodrows)):
-                newvector[goodrows[i],goodrows[j]]=matrix[i,j]
+                newmatrix[goodrows[i],goodrows[j]]=matrix[i,j]
         return newmatrix
 
 #################################################
@@ -76,8 +66,10 @@ def matrix2zeroindex(matrix):
 
 """
 the function gets the obs\exp normed Hi-C matrix and
-returns the PCA results and the correlation matrix """
-def ABcompartments(normmatrix):
+returns the PCA results and the correlation matrix
+eigs is returned with bad rows that contained only 0
+ """
+def PCA(normmatrix):
     from numpy import corrcoef
     from scipy import cov
     from scipy import linalg
@@ -94,6 +86,19 @@ def ABcompartments(normmatrix):
     covmatrix = cov(copymatrix)
     evals, eigs = linalg.eig(covmatrix)
     evreal = [eval.real for eval in evals]
-    #eigs = [vector2expanded(eigs[:,i],badrows) for i in range(len(eigs))]
+    eigs = [vector2expanded(eigs[:,i],badrows) for i in range(10)]
+    copymatrix = matrix2expanded(copymatrix,badrows)
     return evreal, eigs, copymatrix
 
+def ABFromPCA(corrmatrix, eigens):
+    from numpy import dot
+    result = [numpy.zeros(len(eigen)) - ((dot(corrmatrix,eigen))>0) for eigen in eigens]
+    return result
+
+def compareAB(real, test):
+    minlen = min(len(real),len(test))
+    re = numpy.zeros(minlen) + (real[:minlen] > 0)
+    te = numpy.zeros(minlen) - (test[:minlen] > 0)
+    plt.bar(range(len(re)), list(re))
+    plt.bar(range(len(te)), list(te), edgecolor="blue")
+    plt.show()
