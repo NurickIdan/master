@@ -33,19 +33,36 @@ ax1.grid(True)
 PLT.show()
 
 
-maxValueInMap = data.max()
-x = np.arange(maxValueInMap+1)
-ys = [x+i for i in x]
-line_segments = LineCollection([zip(x, y) for y in ys],
-                linewidths=(0.5, 3, 1.5, 2),
-                linestyles='solid', cmap = matplotlib.cm.Blues)
+def plot_heatmap(data):
+    maxValueInMap = data.max()
+    x = np.arange(maxValueInMap+1)
+    ys = [x+i for i in x]
+    line_segments = LineCollection([zip(x, y) for y in ys],
+                    linewidths=(0.5, 3, 1.5, 2),
+                    linestyles='solid', cmap = matplotlib.cm.Blues)
 
-line_segments.set_array(x)
+    line_segments.set_array(x)
 
-fig, ax = plt.subplots()
-heatmap = ax.pcolor(data, cmap=plt.cm.Blues)
-a = ax.set_xticks(np.arange(data.shape[0])+0.5, minor=False)
-b = ax.set_yticks(np.arange(data.shape[0])+0.5, minor=False)
-c = ax.set_xticklabels(keys, minor=False)
-d = ax.set_yticklabels(keys, minor=False)
-axcb = fig.colorbar(line_segments)
+    fig, ax = plt.subplots()
+    heatmap = ax.pcolor(data, cmap=plt.cm.Blues)
+    a = ax.set_xticks(np.arange(data.shape[0])+0.5, minor=False)
+    b = ax.set_yticks(np.arange(data.shape[0])+0.5, minor=False)
+    c = ax.set_xticklabels(keys, minor=False)
+    d = ax.set_yticklabels(keys, minor=False)
+    axcb = fig.colorbar(line_segments)
+    plt.show()
+    return 0
+
+class bin:
+    def __init__(self, ch, start, end):
+        self.start = start
+        self.end = end
+        self.chromosome = ch
+        self.TF = {}
+
+    def __repr__(self):
+        return "bin in chr %s from %s to %s"%(self.chromosome,self.start,self.end)
+
+
+
+
