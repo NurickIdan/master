@@ -78,3 +78,12 @@ for f in files:
 	d = map(TF,file(f,"rb").readlines())
 	key = f.split("/")[-1].split("_")[0].upper()
 	CTCF[key]=d
+
+#generating heatmap
+for i in range(len(keys)):
+	for j in range(i):
+		print keys[i],keys[j]
+		onlyi = [x for x in dic_bins.values() if keys[i] in x.TF["CTCF"] and keys[j] not in x.TF["CTCF"]]
+		onlyj = [x for x in dic_bins.values() if keys[j] in x.TF["CTCF"] and keys[i] not in x.TF["CTCF"]]
+		data[i,j] = chisq(check_regexp_AB(hun[keys[i]][0],hun[keys[i]][1], onlyi),check_regexp_AB(hun[keys[j]][0],hun[keys[j]][1], onlyi))
+		data[j,i] = chisq(check_regexp_AB(hun[keys[i]][0],hun[keys[i]][1], onlyj),check_regexp_AB(hun[keys[j]][0],hun[keys[j]][1], onlyj))
