@@ -64,5 +64,17 @@ class bin:
         return "bin in chr %s from %s to %s"%(self.chromosome,self.start,self.end)
 
 
+#updating dic_bins
+for key in CTCF_chipseq:
+	for chip in CTCF_chipseq[key]:
+		if chip.chromosome == 'chrY':
+			continue
+		start = chip.start/5000*5000
+		tmp = bin(chip.chromosome, start, start+5000)
+		dic_bins[str(tmp)].TF["CTCF"].append(key)
 
-
+# parsing chip seq files
+for f in files:
+	d = map(TF,file(f,"rb").readlines())
+	key = f.split("/")[-1].split("_")[0].upper()
+	CTCF[key]=d
